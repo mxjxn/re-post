@@ -5,6 +5,26 @@
               [cljs.core.async :refer [put! <! >! chan timeout]]
               [cljs-http.client :as http]))
 
+
+;; Event handlers
+;; * * * * * * * *
+
+(re-frame/reg-event-fx
+  :save
+  (fn [cofx [_ txt]]
+    (assoc cofx :save-post {:username "max" :body txt})))
+
+(re-frame/reg-event-fx
+ :initialize-db
+ (fn  [cofx _]
+   {:db db/init-db
+    :retrieve-posts true}))
+
+(re-frame/reg-event-db
+ :posts-recieved
+ (fn [app-db posts]
+   (assoc app-db :posts (get posts 1))))
+
 ;; Effect handlers
 ;; * * * * * * * * 
 
@@ -28,18 +48,4 @@
           (re-frame/dispatch [:posts-recieved (:body resp)])))))
 
 
-(re-frame/reg-event-fx
-  :save
-  (fn [cofx [_ txt]]
-    (assoc cofx :save-post {:username "macks" :body txt})))
 
-(re-frame/reg-event-fx
- :initialize-db
- (fn  [cofx _]
-   {:db db/init-db
-    :retrieve-posts true}))
-
-(re-frame/reg-event-db
- :posts-recieved
- (fn [app-db posts]
-   (assoc app-db :posts (get posts 1))))

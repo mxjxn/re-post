@@ -7,27 +7,39 @@
             [ring.middleware.defaults 
              :refer [wrap-defaults api-defaults]]))
 
-(def posts (atom [{:username "Max" 
-                   :id       "post-1"
-                   :body     "This is my first post"}
-                 ,{:username "Max" 
-                   :id       "post-2"
-                   :body     "This is my second post"}]))
+(defn make-user 
+  ([uname]
+  (make-user uname "password"))
+  ([uname pw]
+  {:username uname
+   :password pw}))
+
+(def mock-users-list #{"max" "steve" "amy" "jenn"})
+
+(def user-db (set (vec (map make-user mock-users-list))))
+
+(def posts (atom []))
+
+(def uid (atom 0))
+(defn next-uid [] 
+  (swap! uid inc))
+
+(defn create-post! [usr post]
+  (if (contains? mock-users-list usr)
+    (do 
+      (swap! posts conj {:username usr :id (next-uid) :body post}))))
 
 (defroutes app-routes
   (GET "/" [] (->
                 (resource-response "index.html" {:root "public"})
                 (content-type "text/html")))
+  (GET "/posts" [] (response @posts))
   (POST "/post" r (let [req      (:body r)
                         
                         body     (get req "body")
                         username (get req "username")]
-                       (println "req: " req)
-                       (println "username: " username)
-                       (println "body: " body)
-                       (swap! posts conj {:username username, :body body})
-                       (response @posts)))
-  (GET "/posts" [] (response @posts))
+                     (create-post! username body)
+                     (response @posts)))
   (route/resources "/")
   (route/not-found "Not Found"))
 
