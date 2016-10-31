@@ -15,7 +15,7 @@
     (devtools/install!)))
 
 (defn mount-root []
-  (reagent/render [views/main-panel]
+  (reagent/render [views/logged-in-check]
                   (.getElementById js/document "app")))
 
 (defn ^:export init []

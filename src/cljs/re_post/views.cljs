@@ -16,6 +16,15 @@
           {:on-click #(re-frame/dispatch [:save @txt])} 
           "Submit"]]]]])))
 
+; TODO: MAKE THIS WORK!
+(defn login-panel [] 
+  (let [usernm (r/atom "")]
+    (fn [] 
+      [:input {:type "text"
+               :on-change #(reset! usernm (-> % .-target .-value))
+               :on-key-down #(case (.-which %)
+                               13 (re-frame/dispatch [:login @usernm]))}])))
+
 (defn main-panel []
   (let [posts (re-frame/subscribe [:posts])
         name  (re-frame/subscribe [:name])]
@@ -28,3 +37,12 @@
           [:li 
            [:u "Username: " (:username post)]
            [:p (:body post)]])]])))
+
+; TODO: MAKE THIS WORK!
+(defn logged-in-check []
+  (let [loggd-in (re-frame/subscribe [:login-status])] 
+
+    (fn []
+    (cond
+      (= @loggd-in false) [login-panel]
+      (= @loggd-in true) [main-panel]))))

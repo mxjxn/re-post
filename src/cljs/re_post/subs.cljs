@@ -11,3 +11,8 @@
  :posts
   (fn [db]
     (:posts db)))
+
+(re-frame/reg-sub
+ :login-status
+  (fn [db]
+    (:login-status db)))

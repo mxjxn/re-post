@@ -18,9 +18,12 @@
 
 (def user-db (set (vec (map make-user mock-users-list))))
 
+(println "user-db" user-db)
+
 (def posts (atom []))
 
 (def uid (atom 0))
+
 (defn next-uid [] 
   (swap! uid inc))
 
@@ -40,6 +43,14 @@
                         username (get req "username")]
                      (create-post! username body)
                      (response @posts)))
+  ;TODO: Make this work!
+  (POST "/login" r (let [req      (:body r)
+                         username (get req "username")]
+                     (println "logging in with " username)
+                     (cond
+                       (contains? mock-users-list username) 
+                       (response {:success true :username username})
+                       :else (response {:success false}))))
   (route/resources "/")
   (route/not-found "Not Found"))
 
